@@ -41,7 +41,8 @@ class MGI_Test {
     // rviz visual tools gui
     void rc_cb(const sensor_msgs::Joy::ConstPtr& msg);
     // goal for end-effector
-    void endeffector_goal_cb(const geometry_msgs::PointStamped::ConstPtr& msg);
+    void endeffector_goal_position_cb(const geometry_msgs::PointStamped::ConstPtr& msg);
+    void endeffector_goal_pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg);
 
     ros::NodeHandle nh_;
     ros::NodeHandle private_nh_;
@@ -63,7 +64,8 @@ class MGI_Test {
     tf::Stamped<tf::Pose> T_EE_ref_W_{tf::Pose(), ros::Time(0), ""};  // end-effector-reference to world
 
     ros::Subscriber rc_sub_;
-    ros::Subscriber endeffector_goal_sub_;
+    ros::Subscriber endeffector_goal_position_sub_;
+    ros::Subscriber endeffector_goal_pose_sub_;
 
 };  //  class MGI_Test
 
