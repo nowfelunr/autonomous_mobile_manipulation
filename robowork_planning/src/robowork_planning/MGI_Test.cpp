@@ -59,7 +59,8 @@ void MGI_Test::initialize()
 
   // Setup Callbacks
   rc_sub_ = nh_.subscribe("/rviz_visual_tools_gui", 10, &MGI_Test::rc_cb, this);
-  endeffector_goal_sub_ = nh_.subscribe("/endeffector_goal", 10, &MGI_Test::endeffector_goal_cb, this);
+  endeffector_goal_position_sub_ = nh_.subscribe("/endeffector_goal_position", 10, &MGI_Test::endeffector_goal_position_cb, this);
+  endeffector_goal_pose_sub_ = nh_.subscribe("/endeffector_goal_pose", 10, &MGI_Test::endeffector_goal_pose_cb, this);
 
   ROS_INFO_STREAM_NAMED(move_group::NODE_NAME, "Setup complete!");
 }
@@ -91,7 +92,7 @@ void MGI_Test::rc_cb(const sensor_msgs::Joy::ConstPtr& msg)
   }
 }
 
-void MGI_Test::endeffector_goal_cb(const geometry_msgs::PointStamped::ConstPtr& msg)
+void MGI_Test::endeffector_goal_position_cb(const geometry_msgs::PointStamped::ConstPtr& msg)
 {
   if (move_group_) {
     move_group_->stop();
@@ -108,6 +109,33 @@ void MGI_Test::endeffector_goal_cb(const geometry_msgs::PointStamped::ConstPtr& 
   tf::Stamped<tf::Point> t_EE_ref_W;
   tf::pointStampedMsgToTF(target_point_received, t_EE_ref_W);
   T_EE_ref_W_ = tf::Stamped<tf::Pose>(tf::Pose(/*tf::Quaternion(0,0,0,1)*/T_EE_W_.getRotation(), static_cast<tf::Point>(t_EE_ref_W)), t_EE_ref_W.stamp_, t_EE_ref_W.frame_id_);
+  if (T_EE_ref_W_.frame_id_ != world_link_) {
+    ROS_WARN_STREAM("move_group_interface: Goal in frame [" << T_EE_ref_W_.frame_id_ << "], have to transform into [" << world_link_ << "]"); 
+    //TODO
+    throw std::runtime_error("move_group_interface: Wrong frame in received msg");
+  }
+
+  // Execute planning
+  //plan();
+}
+
+void MGI_Test::endeffector_goal_pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+  if (move_group_) {
+    move_group_->stop();
+  }
+  else {
+    ROS_WARN_STREAM("move_group_interface: move_group_ not constructed yet"); 
+    throw std::runtime_error("move_group_interface: move_group_ not constructed yet");
+  }
+
+  ROS_INFO_STREAM("move_group_interface: New PoseStamped goal in frame [" << msg->header.frame_id << "] received!");
+  geometry_msgs::PoseStamped target_pose_received = *msg;
+
+  // Ensure that end-effector reference is in world frame 
+  tf::Stamped<tf::Pose> t_EE_ref_W;
+  tf::poseStampedMsgToTF(target_pose_received, t_EE_ref_W);
+  T_EE_ref_W_ = tf::Stamped<tf::Pose>(static_cast<tf::Pose>(t_EE_ref_W), t_EE_ref_W.stamp_, t_EE_ref_W.frame_id_);
   if (T_EE_ref_W_.frame_id_ != world_link_) {
     ROS_WARN_STREAM("move_group_interface: Goal in frame [" << T_EE_ref_W_.frame_id_ << "], have to transform into [" << world_link_ << "]"); 
     //TODO

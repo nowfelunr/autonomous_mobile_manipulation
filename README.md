@@ -156,8 +156,11 @@ rostopic pub --once -s /rviz_2d_nav_goal geometry_msgs/PoseStamped "{header: {se
 
 # The move_base node will immediately start planning and moving to execute the goal 
 
-# Terminal A3 - Publish a goal position in the 'map' frame for the end-effector
-rostopic pub --once -s /endeffector_goal geometry_msgs/PointStamped "{header: {seq: 0, stamp: now, frame_id: 'map'}, point: {x: 1.75, y: 0, z: 0.75}}"
+# Terminal A3 (option i) - Publish a goal position in the 'map' frame for the end-effector
+rostopic pub --once -s /endeffector_goal_position geometry_msgs/PointStamped "{header: {seq: 0, stamp: now, frame_id: 'map'}, point: {x: 1.75, y: 0, z: 0.75}}"
+
+# Terminal A3 (option ii) - Publish a goal pose (position & orientation) in the 'map' frame for the end-effector
+rostopic pub --once -s /endeffector_goal_pose geometry_msgs/PoseStamped "{header: {seq: 0, stamp: now, frame_id: 'map'}, pose: {position: {x: 1.75, y: 0, z: 0.75}, orientation: {x: 0, y: 0.383, z: 0, w: 0.924}}}"
 
 # On Terminal A1 you should see a message from the move_group_interface_vTest node:
 # "move_group_interface: New PointStamped goal in frame [map] received!"
