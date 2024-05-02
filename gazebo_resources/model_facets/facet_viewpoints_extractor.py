@@ -15,7 +15,7 @@ from mpl_toolkits import mplot3d
 from matplotlib.colors import Normalize
 from matplotlib import pyplot
 import collada as cl
-import open3d as o3d # for visualization
+# import open3d as o3d # for visualization
 import csv
 import copy
 import argparse
