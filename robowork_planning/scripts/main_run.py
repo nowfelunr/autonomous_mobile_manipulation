@@ -14,6 +14,7 @@ from arm_movement_calculations import get_arm_placement_point, get_arm_placement
 from arm_movement import move_arm, monitor_arm, move_arm_to_home
 import moveit_commander
 import os
+from tsp import nearest_neighbor
 
 moveit_commander.roscpp_initialize(sys.argv)
 robot = moveit_commander.RobotCommander()
@@ -138,9 +139,14 @@ if __name__ == '__main__':
                 current_point['status'] = False
                 continue
             current_point['status'] = True
+            #nearby_points = {key: value for key, value in all_points.items() if distance_between_points(PointCustom(base_moving_point[0], base_moving_point[1], base_moving_point[2], 0, 0, 0, 0), value) <= 1.}
             nearby_points = {key: value for key, value in all_points.items() if distance_between_points(PointCustom(base_moving_point[0], base_moving_point[1], base_moving_point[2], 0, 0, 0, 0), value) <= 1.}
+            
+            nearby_points = nearest_neighbor(nearby_points)
+
+
             # Sort the nearby points by distance from the random_point
-            sorted_nearby_points = sorted(nearby_points.items(), key=lambda x: distance_between_points(random_point, x[1]))
+            # sorted_nearby_points = sorted(nearby_points.items(), key=lambda x: distance_between_points(random_point, x[1]))
             
             rospy.loginfo("Total nearby points: {}".format(len(nearby_points)))
             current_point['total_cluster_points'] = len(nearby_points)
@@ -150,8 +156,8 @@ if __name__ == '__main__':
             rospy.loginfo("Y = {}".format(y_1))
             
             
-            
-            for point_index, point in sorted_nearby_points:
+            print(type(nearby_points))
+            for point_index, point in nearby_points:
                 current_cluster_point = dict()
                 current_cluster_point['x'] = point.x
                 current_cluster_point['y'] = point.y
