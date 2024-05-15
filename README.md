@@ -166,5 +166,5 @@ pip3 install flask
 cd $HOME/autonomous_mobile_manipulation_ws/src/autonomous_mobile_manipulation/robowork_planning/src && python3 app.py
 
 # Open browser and visit
-127.0.0.1:500
+127.0.0.1:5000
 ```
