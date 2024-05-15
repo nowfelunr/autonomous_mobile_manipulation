@@ -15,7 +15,7 @@ from arm_movement import move_arm, monitor_arm, move_arm_to_home
 import moveit_commander
 import os
 from tsp import nearest_neighbor
-
+import time
 moveit_commander.roscpp_initialize(sys.argv)
 robot = moveit_commander.RobotCommander()
 scene = moveit_commander.PlanningSceneInterface()
@@ -111,6 +111,8 @@ if __name__ == '__main__':
             all_points[i] = PointCustom(x, y, z, qx, qy, qz, qw)
 
         while all_points.keys():
+            # Seed the random number generator
+            np.random.seed(int(time.time()))
             # Select a random point from the all_points dictionary
             random_point_index = np.random.choice(list(all_points.keys()))
             random_point = all_points[random_point_index]
@@ -142,8 +144,13 @@ if __name__ == '__main__':
             #nearby_points = {key: value for key, value in all_points.items() if distance_between_points(PointCustom(base_moving_point[0], base_moving_point[1], base_moving_point[2], 0, 0, 0, 0), value) <= 1.}
             nearby_points = {key: value for key, value in all_points.items() if distance_between_points(PointCustom(base_moving_point[0], base_moving_point[1], base_moving_point[2], 0, 0, 0, 0), value) <= 1.}
             
+            # pre append base_moving_point to nearby_points
+            nearby_points[-1] = PointCustom(base_moving_point[0], base_moving_point[1], base_moving_point[2], 0, 0, 0, 0)
+
             nearby_points = nearest_neighbor(nearby_points)
 
+            # Delete the point from nearby points where index is -1
+            del nearby_points[-1]
 
             # Sort the nearby points by distance from the random_point
             # sorted_nearby_points = sorted(nearby_points.items(), key=lambda x: distance_between_points(random_point, x[1]))
