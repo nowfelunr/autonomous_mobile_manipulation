@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Display</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            background: #0056b3;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0;
+            text-shadow: 1px 1px 0 #444;
+        }
+
+        #statusContainer {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .successful { color: green; font-weight: bold; }
+        .failed { color: red; font-weight: bold; }
+        .attempting { color: brown; font-weight: bold; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            background: #f9f9f9;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Boat Sanding Project</h1>
+    <div id="statusContainer">
+        <p>Loading data...</p>
+    </div>
+
+    <script>
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    let content = '';
+                    if (data.error) {
+                        $('#statusContainer').html(`<p>Error: ${data.error}</p>`);
+                    } else {
+                        // Reverse the data array to show the latest data first
+                        data = data.reverse();
+                        for (const entry of data) {
+                            const successfulCount = entry.cluser_points.filter(point => point.status === 'Reached').length;
+                            const failedCount = entry.cluser_points.filter(point => point.status === 'Unreachable').length;
+                            
+                            const remainingCount = entry.total_cluster_points - successfulCount - failedCount;
+                            const totalAttemptedPoints = successfulCount + failedCount;
+                            content += `<div>
+                                <h2>Point Index: ${entry.index}</h2>
+                                <p>Point position and quaternion: (x: ${entry.x}, y: ${entry.y}, z: ${entry.z}, qx: ${entry.qx}, qy: ${entry.qy}, qz: ${entry.qz}, qw: ${entry.qw})</p>
+                                <p>Point Status: ${entry.status ? 'Successful' : 'Failed'}</p>
+                                <table>
+                                    <tr><th>Total Cluster Points</th><th>Total attempted points</th><th>Recahed Points</th><th>Unreached Points</th><th>Remaining Points</th></tr>
+                                    <tr><td>${entry.total_cluster_points}</td><td>${totalAttemptedPoints}</td><td>${successfulCount}</td><td>${failedCount}</td><td>${remainingCount}</td></tr>
+                                </table>
+                                <h3>Last Five Cluster Point Statuses:</h3>
+                                <ul>`;
+                            // Reverse the cluster points array to show the latest data first. Show those points in a table. Make the table scrollable and show only the last 5 points.
+                            content += '<table><tr><th>Point Index</th><th>Position (x,y,z)</th><th>Quaternion (qx,qy,qz,qw)</th><th>Status</th></tr>';
+                            for (const point of entry.cluser_points.slice().reverse().slice(0, 5)) {
+                                let colorClass = 'attempting';
+                                if (point.status === 'Reached') {
+                                    colorClass = 'successful';
+                                } else if (point.status === 'Unreachable') {
+                                    colorClass = 'failed';
+                                }
+                                content += `<tr class="${colorClass}"><td>${point.index}</td><td>${point.x},${point.y},${point.z}</td><td>${point.qx},${point.qy},${point.qz},${point.qw}<td>${point.status}</td></tr>`;
+                            }
+
+                            content += '</table>';
+                            content += '</ul></div>';
+                        }
+                        $('#statusContainer').html(content);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    $('#statusContainer').html('<p>Error fetching data. See console for more details.</p>');
+                });
+        }
+
+        $(document).ready(function() {
+            fetchData();
+            setInterval(fetchData, 1000); // Refresh the data every second
+        });
+    </script>
+</body>
+</html>

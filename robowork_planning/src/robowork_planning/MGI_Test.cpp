@@ -116,7 +116,7 @@ void MGI_Test::endeffector_goal_position_cb(const geometry_msgs::PointStamped::C
   }
 
   // Execute planning
-  //plan();
+  plan();
 }
 
 void MGI_Test::endeffector_goal_pose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
@@ -143,7 +143,7 @@ void MGI_Test::endeffector_goal_pose_cb(const geometry_msgs::PoseStamped::ConstP
   }
 
   // Execute planning
-  //plan();
+  plan();
 }
 
 void MGI_Test::plan() {
