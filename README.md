@@ -150,8 +150,9 @@ roslaunch robowork_moveit_config moveit_rviz.launch
 # Terminal 4 - Launch robowork_planning sample node (vTest)
 ROS_NAMESPACE="bvr_SIM" roslaunch robowork_planning move_group_interface_vTest.launch robot_namespace:=bvr_SIM arm_namespace:=main_arm_SIM sim_suffix:=_SIM
 
-# Terminal 5 - Publish a goal pose in the 'map' frame for the mobile robot
-ROS_NAMESPACE="bvr_SIM" roslaunch robowork_planning move_group_interface_vTest.launch robot_namespace:=bvr_SIM arm_namespace:=main_arm_SIM sim_suffix:=_SIM
+# Terminal 5 - Launch automated robot movement and planning for sanding
+ROS_NAMESPACE="bvr_SIM" roslaunch robowork_planning move_robot.launch robot_namespace:=bvr_SIM arm_namespace:=main_arm_SIM sim_suffix:=_SIM
+
 
 # The move_base node will immediately start planning and moving to execute the goal 
 ```
@@ -163,8 +164,8 @@ View Profiler In Browser
 pip3 install flask
 
 # Run the server
-cd $HOME/autonomous_mobile_manipulation_ws/src/autonomous_mobile_manipulation/robowork_planning/src && python3 app.py
+cd $HOME/autonomous_mobile_manipulation_ws/src/autonomous_mobile_manipulation/robowork_planning/scripts && python3 app.py
 
-# Open browser and visit
-127.0.0.1:5000
+# Open browser and visit the profiler
+http://127.0.0.1:5000/
 ```

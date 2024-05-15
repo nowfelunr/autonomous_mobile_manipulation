@@ -10,7 +10,7 @@ def index():
 @app.route('/data')
 def data():
     try:
-        with open('status_log.json', 'r') as file:  # Adjust the path as needed
+        with open('log.json', 'r') as file:  # Adjust the path as needed
             data = json.load(file)
     except FileNotFoundError:
         data = {'error': 'File not found'}
